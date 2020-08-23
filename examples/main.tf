@@ -13,6 +13,7 @@ module "k3s-master" {
   vm_num = 1
 
   sockets = 2
+  numa = true
   memory = 4096
 
   networks = [
@@ -25,12 +26,13 @@ module "k3s-master" {
 }
 
 module "k3s-node" {
-  source = "./"
+  source = "../"
 
   vm_name = "k3s-node"
   vm_num = 2
 
   sockets = 2
+  numa = true
   memory = 4096
 
   networks = [

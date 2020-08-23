@@ -9,8 +9,8 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
 
   sockets = var.sockets
   cores = var.cores
+  numa = var.numa
   memory = var.memory
-  numa = true
   scsihw = "virtio-scsi-pci"
   boot = "c"
   bootdisk = "scsi0"
@@ -33,6 +33,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       storage      = lookup(disk.value, "storage", "local-lvm")
       storage_type = lookup(disk.value, "storage_type", "lvm")
       size         = lookup(disk.value, "size", 20)
+      discard      = lookup(disk.value, "discard", null)
     }
   }
 

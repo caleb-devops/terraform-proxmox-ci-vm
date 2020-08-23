@@ -38,6 +38,12 @@ variable "cores" {
   default = 1
 }
 
+variable "numa" {
+  description = "Enable/disable NUMA"
+  type = bool
+  default = false
+}
+
 variable "memory" {
   description = "Amount of RAM for the VM in MB"
   type = number
