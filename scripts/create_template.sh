@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Creates a cloud-init image with qemu-guest-agent installed.
-# The image will be coppied to the Proxmox host, and used to create a VM template.
+# The image will be copied to the Proxmox host, and used to create a VM template.
 
 createImage() {
   if [[ ! -r /boot/vmlinuz-$(uname -r) ]]; then
