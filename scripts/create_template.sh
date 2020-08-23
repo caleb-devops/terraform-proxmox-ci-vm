@@ -1,10 +1,34 @@
 #!/bin/bash
 
-# Creates a cloud-init image with qemu-guest-agent installed.
-# The image will be copied to the Proxmox host, and used to create a VM template.
+DESTROY_VM=0
+IMAGE=0
+TEMPLATE=0
+ENVIRONMENT_FILE=vm.env
+
+HELP() {
+  cat << EOT
+Creates a Cloud-Init VM template with qemu-guest-agent installed for use with Proxmox.
+
+Requirements:
+  libguestfs-tools
+
+Usage: $(basename $0) [-itd] [-e FILE] [-h]
+  -i        Create image with qemu-guest-agent installed
+  -t        Create Proxmox template from image
+  -d        Destroy the VM if it exists
+  -e FILE   Path to the environment file
+  -h        Display this help and exit
+EOT
+}
+
+USAGE() {
+  echo "Usage: $(basename $0) [-itd] [-e FILE] [-h]"
+  echo "Try '$(basename $0) -h' for more information"
+}
 
 createImage() {
   if [[ ! -r /boot/vmlinuz-$(uname -r) ]]; then
+    echo "The kernel must be readable by non-root users to use libguestfs."
     sudo chmod 0644 /boot/vmlinuz-$(uname -r)
   fi
 
@@ -22,7 +46,7 @@ createTemplate() {
     qm status $VM_ID > /dev/null
 
     if [ $? -eq 0 ]; then
-      if [ $FORCE -eq 1 ]; then
+      if [ $DESTROY_VM -eq 1 ]; then
         qm destroy $VM_ID
       else
         printf "\nVM $VM_ID already exists\n\n"
@@ -38,41 +62,43 @@ createTemplate() {
 EOT
 }
 
-ENVIRONMENT=vm.env
-FORCE=0
-IMAGE=1
-TEMPLATE=1
+NUMARGS=$#
+if [ $NUMARGS -eq 0 ]; then
+  USAGE
+  exit 0
+fi
 
-POSITIONAL=()
-while [[ $# -gt 0 ]]; do
-  key="$1"
-
-  case $key in
-    -e)
-      ENVIRONMENT="$2"
-      shift
-      shift
+while getopts :hitde: opt; do
+  case $opt in
+    h)
+      HELP
       ;;
-    -f)
-      FORCE=1
-      shift
-      ;;
-    -i)
+    i)
       IMAGE=1
-      TEMPLATE=0
-      shift
       ;;
-    -t)
-      IMAGE=0
+    t)
       TEMPLATE=1
-      shift
+      ;;
+    d)
+      DESTROY_VM=1
+      ;;
+    e)
+      ENVIRONMENT_FILE=$OPTARG
+      ;;
+    \?)
+      USAGE
+      exit 0
+      ;;
+    :)
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      exit 0
       ;;
   esac
 done
 
-set -- "${POSITIONAL[@]}" # restore positional parameters
+shift $((OPTIND -1))
 
-source $ENVIRONMENT
+source $ENVIRONMENT_FILE
 
 if [ $IMAGE -eq 1 ]; then
   createImage
