@@ -17,13 +17,8 @@ variable "vm_template" {
 }
 
 variable "vm_name" {
-  description = "Name of VM"
+  description = "The name of the virtual machine"
   type = string
-}
-
-variable "vm_num" {
-  description = "Number of VMs to deploy"
-  type = number
 }
 
 variable "sockets" {
@@ -67,40 +62,20 @@ variable "networks" {
 #####################################################
 
 variable "ipconfig0" {
-  description = <<-EOT
-    Specify IP addresses and gateways for the corresponding interface. IP address will auto increment for each VM.
-    ip=<IPv4Format/CIDR> (default = dhcp)
-      IPv4 address in CIDR format.
-    gw=<GatewayIPv4>
-      Default gateway for IPv4 traffic.
-  EOT
-  type = map(string)
-  default = {
-    ip = "dhcp"
-  }
+  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
+  type = string
+  default = "ip=dhcp"
 }
 
 variable "ipconfig1" {
-  description = <<-EOT
-    Specify IP addresses and gateways for the corresponding interface. IP address will auto increment for each VM.
-    ip=<IPv4Format/CIDR> (default = dhcp)
-      IPv4 address in CIDR format.
-    gw=<GatewayIPv4>
-      Default gateway for IPv4 traffic.
-  EOT
-  type = map(string)
+  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
+  type = string
   default = null
 }
 
 variable "ipconfig2" {
-  description = <<-EOT
-    Specify IP addresses and gateways for the corresponding interface. IP address will auto increment for each VM.
-    ip=<IPv4Format/CIDR> (default = dhcp)
-      IPv4 address in CIDR format.
-    gw=<GatewayIPv4>
-      Default gateway for IPv4 traffic.
-  EOT
-  type = map(string)
+  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
+  type = string
   default = null
 }
 
