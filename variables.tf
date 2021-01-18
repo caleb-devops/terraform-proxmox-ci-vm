@@ -109,6 +109,12 @@ variable "public_key_path" {
   default = "~/.ssh/id_ed25519.pub"
 }
 
+variable "private_key_path" {
+  description = "Path to the ssh private key"
+  type = string
+  default = "~/.ssh/id_ed25519"
+}
+
 variable "ansible_groups" {
   description = "List of ansible groups to assign to the VM"
   type = list(string)

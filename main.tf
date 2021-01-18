@@ -61,6 +61,22 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       cipassword,
     ]
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo netplan apply",
+      "sudo sed -i 's|-o \\x27-p -- \\\\\\\\u\\x27|-a ${var.ciuser}|' /lib/systemd/system/serial-getty@.service",
+      "sudo systemctl daemon-reload",
+      "sudo service serial-getty@ttyS0 restart"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = var.ciuser
+      private_key = file(var.private_key_path)
+      host        = self.ssh_host
+    }
+  }
 }
 
 resource "ansible_host" "proxmox_vm" {

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 DESTROY_VM=0
 IMAGE=0
 TEMPLATE=0
