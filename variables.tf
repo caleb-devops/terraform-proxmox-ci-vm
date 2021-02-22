@@ -1,122 +1,132 @@
+#####################################################
+# VM Qemu Resource
+#####################################################
+
 variable "target_node" {
-  description = "Node to place the VM on"
-  type = string
-  default = "pve"
+  description = "The name of the Proxmox Node on which to place the VM"
+  type        = string
+  default     = "pve"
 }
 
-variable "pm_pool" {
+variable "pool" {
   description = "The destination resource pool for the new VM"
-  type = string
-  default = "terraform"
+  type        = string
+  default     = null
 }
 
-variable "vm_template" {
-  description = "Name of virtual machine to clone"
-  type = string
-  default = "ubuntu-2004-cloudinit-template"
+variable "name" {
+  description = "The name of the VM within Proxmox"
+  type        = string
 }
 
-variable "vm_name" {
-  description = "The name of the virtual machine"
-  type = string
+variable "clone" {
+  description = "The base VM from which to clone to create the new VM"
+  type        = string
 }
 
 variable "sockets" {
-  description = "The number of CPU sockets"
-  type = number
-  default = 1
+  description = "The number of CPU sockets to allocate to the VM"
+  type        = number
+  default     = 1
 }
 
 variable "cores" {
-  description = "The number of cores per socket"
-  type = number
-  default = 1
+  description = "The number of CPU cores per CPU socket to allocate to the VM"
+  type        = number
+  default     = 1
 }
 
 variable "numa" {
-  description = "Enable/disable NUMA"
-  type = bool
-  default = false
+  description = "Whether to enable Non-Uniform Memory Access in the guest"
+  type        = bool
+  default     = false
 }
 
 variable "memory" {
-  description = "Amount of RAM for the VM in MB"
-  type = number
-  default = 512
+  description = "The amount of memory to allocate to the VM in Megabytes"
+  type        = number
+  default     = 512
 }
 
 variable "disks" {
   description = "VM disk config"
-  type = list(map(string))
-  default = [{}]
+  type        = list(object({}))
+  default     = [{}]
 }
 
 variable "networks" {
   description = "VM network adapter config"
-  type = list(map(string))
-  default = [{}]
+  type        = list(object({}))
+  default     = [{}]
 }
 
 #####################################################
-# Cloud-Init Settings
+# Cloud-Init
 #####################################################
 
-variable "ipconfig0" {
-  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
-  type = string
-  default = "ip=dhcp"
+variable "ciuser" {
+  description = "Override the default cloud-init user for provisioning"
+  type        = string
 }
 
-variable "ipconfig1" {
-  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
-  type = string
-  default = null
-}
-
-variable "ipconfig2" {
-  description = "Cloud-init specific, [gw=] [,gw6=] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
-  type = string
-  default = null
-}
-
-variable "nameserver" {
-  description = "DNS server IP"
-  type = string
-  default = null
+variable "cipassword" {
+  description = "Override the default cloud-init user's password"
+  type        = string
+  sensitive   = true
+  default     = null
 }
 
 variable "searchdomain" {
-  description = "DNS search domain"
-  type = string
-  default = null
+  description = "Sets default DNS search domain suffix"
+  type        = string
+  default     = null
 }
 
-variable "ciuser" {
-  description = "User name to change ssh keys and password"
-  type = string
-  default = "ubuntu"
+variable "nameserver" {
+  description = "Sets default DNS server for guest"
+  type        = string
+  default     = null
 }
 
-variable "cipass" {
-  description = "Password to assign the user"
-  type = string
-  default = null
+variable "sshkeys" {
+  description = "Newline delimited list of SSH public keys to add to authorized keys file for the cloud-init user"
+  type        = string
 }
 
-variable "public_key_path" {
-  description = "Path to the ssh public key"
-  type = string
-  default = "~/.ssh/id_ed25519.pub"
+variable "ipconfig0" {
+  description = "The first IP address to assign to the guest. Format: [gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]"
+  type        = string
+  default     = "ip=dhcp"
 }
 
-variable "private_key_path" {
-  description = "Path to the ssh private key"
-  type = string
-  default = "~/.ssh/id_ed25519"
+variable "ipconfig1" {
+  description = "The second IP address to assign to the guest. Same format as ipconfig0"
+  type        = string
+  default     = null
+}
+
+variable "ipconfig2" {
+  description = "The third IP address to assign to the guest. Same format as ipconfig0"
+  type        = string
+  default     = null
+}
+
+#####################################################
+# Other Vars
+#####################################################
+
+variable "connection" {
+  description = "Provisioner connection settings"
+  type        = object({})
+  sensitive   = true
+  default = {
+    type  = "ssh"
+    agent = true
+  }
 }
 
 variable "ansible_groups" {
   description = "List of ansible groups to assign to the VM"
-  type = list(string)
-  default = ["all"]
+  type        = list(string)
+  default     = ["all"]
 }
