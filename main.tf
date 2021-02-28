@@ -1,17 +1,19 @@
 resource "proxmox_vm_qemu" "proxmox_vm" {
   target_node = var.target_node
-  pool = var.pm_pool
+  pool        = var.pool
 
-  name = var.vm_name
-  clone = var.vm_template
+  name  = var.name
+  clone = var.clone
 
   sockets = var.sockets
-  cores = var.cores
-  numa = var.numa
-  memory = var.memory
-  scsihw = "virtio-scsi-pci"
-  boot = "c"
+  cores   = var.cores
+  numa    = var.numa
+  memory  = var.memory
+
+  scsihw   = "virtio-scsi-pci"
+  boot     = "c"
   bootdisk = "scsi0"
+
   agent = 1
 
   vga {
@@ -19,17 +21,17 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   }
 
   serial {
-    id = 0
+    id   = 0
     type = "socket"
   }
 
   dynamic "disk" {
     for_each = var.disks
     content {
-      type         = lookup(disk.value, "type", "scsi")
-      storage      = lookup(disk.value, "storage", "local-lvm")
-      size         = lookup(disk.value, "size", "20G")
-      discard      = lookup(disk.value, "discard", null)
+      type    = lookup(disk.value, "type", "scsi")
+      storage = lookup(disk.value, "storage", "local-lvm")
+      size    = lookup(disk.value, "size", "20G")
+      discard = lookup(disk.value, "discard", null)
     }
   }
 
@@ -45,15 +47,15 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   os_type = "cloud-init"
 
   # Cloud-Init Settings
+  ciuser       = var.ciuser
+  cipassword   = var.cipassword
+  searchdomain = var.searchdomain
+  nameserver   = var.nameserver
+  sshkeys      = var.sshkeys
+
   ipconfig0 = var.ipconfig0
   ipconfig1 = var.ipconfig1
   ipconfig2 = var.ipconfig2
-
-  nameserver = var.nameserver
-  searchdomain = var.searchdomain
-  sshkeys = file(var.public_key_path)
-  ciuser = var.ciuser
-  cipassword = var.cipass
 
   lifecycle {
     ignore_changes = [
@@ -63,24 +65,49 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   }
 
   provisioner "remote-exec" {
+    connection {
+      type = try(var.connection.type, "ssh")
+
+      host     = self.ssh_host
+      user     = self.ciuser
+      password = self.cipassword
+      port     = try(var.connection.port, null)
+      timeout  = try(var.connection.timeout, null)
+
+      script_path    = try(var.connection.script_path, null)
+      private_key    = try(var.connection.private_key, null)
+      certificate    = try(var.connection.certificate, null)
+      agent          = try(var.connection.agent, null)
+      agent_identity = try(var.connection.agent_identity, null)
+      host_key       = try(var.connection.host_key, null)
+
+      https    = try(var.connection.https, null)
+      insecure = try(var.connection.insecure, null)
+      use_ntlm = try(var.connection.use_ntlm, null)
+      cacert   = try(var.connection.cacert, null)
+
+      bastion_host        = try(var.connection.bastion_host, null)
+      bastion_host_key    = try(var.connection.bastion_host_key, null)
+      bastion_port        = try(var.connection.bastion_port, null)
+      bastion_user        = try(var.connection.bastion_user, null)
+      bastion_password    = try(var.connection.bastion_password, null)
+      bastion_private_key = try(var.connection.bastion_private_key, null)
+      bastion_certificate = try(var.connection.bastion_certificate, null)
+    }
+
+    # Enable automatic login to serial console
     inline = [
       "sudo netplan apply",
       "sudo sed -i 's|-o \\x27-p -- \\\\\\\\u\\x27|-a ${var.ciuser}|' /lib/systemd/system/serial-getty@.service",
       "sudo systemctl daemon-reload",
       "sudo service serial-getty@ttyS0 restart"
     ]
-
-    connection {
-      type        = "ssh"
-      user        = var.ciuser
-      private_key = file(var.private_key_path)
-      host        = self.ssh_host
-    }
   }
 }
 
 resource "ansible_host" "proxmox_vm" {
   inventory_hostname = proxmox_vm_qemu.proxmox_vm.name
+
   groups = var.ansible_groups
   vars = {
     ansible_host = proxmox_vm_qemu.proxmox_vm.ssh_host
