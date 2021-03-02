@@ -50,13 +50,13 @@ variable "memory" {
 
 variable "disks" {
   description = "VM disk config"
-  type        = list(object({}))
+  type        = list(map(string))
   default     = [{}]
 }
 
 variable "networks" {
   description = "VM network adapter config"
-  type        = list(object({}))
+  type        = list(map(string))
   default     = [{}]
 }
 
@@ -117,7 +117,7 @@ variable "ipconfig2" {
 
 variable "connection" {
   description = "Provisioner connection settings"
-  type        = object({})
+  type        = map(string)
   sensitive   = true
   default = {
     type  = "ssh"
