@@ -1,3 +1,15 @@
+# terraform-proxmox-ci-vm
+
+Terraform module which creates Proxmox Cloud-Init VMs and adds them to an Ansible dynamic inventory.
+
+<https://github.com/nbering/terraform-inventory/>
+
+## Proxmox VM Template Requirements
+
+The Proxmox VM template must be cloud-init enabled and have `qemu-guest-agent` installed.
+
+`qemu-guest-agent` can be added to an existing cloud image using [create_template.sh](scripts/create_template.sh).
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
