@@ -95,12 +95,27 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       bastion_certificate = try(var.connection.bastion_certificate, null)
     }
 
-    # Enable automatic login to serial console
     inline = [
-      "sudo netplan apply",
-      "sudo sed -i 's|-o \\x27-p -- \\\\\\\\u\\x27|-a ${var.ciuser}|' /lib/systemd/system/serial-getty@.service",
-      "sudo systemctl daemon-reload",
-      "sudo service serial-getty@ttyS0 restart"
+      <<-EOT
+      # --- use sudo if we are not already root ---
+      [ $(id -u) -eq 0 ] || exec sudo -n $0 $@
+
+      set -x
+
+      # Apply netplan to update hostname on DHCP server
+      netplan apply
+
+      # Enable automatic login to serial console
+      mkdir /usr/lib/systemd/system/serial-getty@ttyS0.service.d
+      cat << 'EOF' > /usr/lib/systemd/system/serial-getty@ttyS0.service.d/override.conf
+      [Service]
+      ExecStart=
+      ExecStart=-/sbin/agetty -a ${var.ciuser} --keep-baud 115200,38400,9600 %I $TERM
+      EOF
+
+      systemctl daemon-reload
+      service serial-getty@ttyS0 restart
+      EOT
     ]
   }
 }
