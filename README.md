@@ -1,8 +1,6 @@
 # terraform-proxmox-ci-vm
 
-Terraform module which creates Proxmox Cloud-Init VMs and adds them to an Ansible dynamic inventory.
-
-<https://github.com/nbering/terraform-inventory/>
+Terraform module which creates Proxmox Cloud-Init VMs. Supports Ansible groups using <https://github.com/xezpeleta/Ansible-Proxmox-inventory>.
 
 ## Proxmox VM Template Requirements
 
@@ -15,15 +13,13 @@ The Proxmox VM template must be cloud-init enabled and have `qemu-guest-agent` i
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.14 |
-| ansible | ~> 1.0.4 |
+| terraform | ~> 1.0 |
 | proxmox | ~> 2.6.5 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| ansible | ~> 1.0.4 |
 | proxmox | ~> 2.6.5 |
 
 ## Modules
@@ -34,14 +30,13 @@ No Modules.
 
 | Name |
 |------|
-| [ansible_host](https://registry.terraform.io/providers/nbering/ansible/latest/docs/resources/host) |
 | [proxmox_vm_qemu](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs/resources/vm_qemu) |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ansible\_groups | List of ansible groups to assign to the VM | `list(string)` | <pre>[<br>  "all"<br>]</pre> | no |
+| ansible\_groups | List of ansible groups to assign to the VM. Stored as JSON in the Notes field in Proxmox. | `list(string)` | `[]` | no |
 | cipassword | Override the default cloud-init user's password | `string` | `null` | no |
 | ciuser | Override the default cloud-init user for provisioning | `string` | n/a | yes |
 | clone | The base VM from which to clone to create the new VM | `string` | n/a | yes |
@@ -60,6 +55,7 @@ No Modules.
 | searchdomain | Sets default DNS search domain suffix | `string` | `null` | no |
 | sockets | The number of CPU sockets to allocate to the VM | `number` | `1` | no |
 | sshkeys | Newline delimited list of SSH public keys to add to authorized keys file for the cloud-init user | `string` | n/a | yes |
+| tags | Map of tags to add to the VM. Stored as JSON in the Notes field in Proxmox. | `map(string)` | `{}` | no |
 | target\_node | The name of the Proxmox Node on which to place the VM | `string` | `"pve"` | no |
 
 ## Outputs
