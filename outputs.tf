@@ -20,5 +20,5 @@ output "username" {
 
 output "groups" {
   description = "The Ansible groups assigned to the VM"
-  value       = ansible_host.proxmox_vm.groups
+  value       = var.ansible_groups
 }

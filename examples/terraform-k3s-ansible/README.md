@@ -9,15 +9,12 @@
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.14 |
-| ansible | ~> 1.0.4 |
+| terraform | ~> 1.0 |
 | proxmox | ~> 2.6.5 |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| ansible | ~> 1.0.4 |
+No provider.
 
 ## Modules
 
@@ -28,9 +25,7 @@
 
 ## Resources
 
-| Name |
-|------|
-| [ansible_group](https://registry.terraform.io/providers/nbering/ansible/latest/docs/resources/group) |
+No resources.
 
 ## Inputs
 

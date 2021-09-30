@@ -60,6 +60,28 @@ variable "networks" {
   default     = [{}]
 }
 
+variable "tags" {
+  description = "Map of tags to add to the VM. Stored as JSON in the Notes field in Proxmox."
+  type        = map(string)
+  default     = {}
+}
+
+variable "ansible_groups" {
+  description = "List of ansible groups to assign to the VM. Stored as JSON in the Notes field in Proxmox."
+  type        = list(string)
+  default     = []
+}
+
+variable "connection" {
+  description = "Provisioner connection settings"
+  type        = map(string)
+  sensitive   = true
+  default = {
+    type  = "ssh"
+    agent = true
+  }
+}
+
 #####################################################
 # Cloud-Init
 #####################################################
@@ -109,24 +131,4 @@ variable "ipconfig2" {
   description = "The third IP address to assign to the guest. Same format as ipconfig0"
   type        = string
   default     = null
-}
-
-#####################################################
-# Other Vars
-#####################################################
-
-variable "connection" {
-  description = "Provisioner connection settings"
-  type        = map(string)
-  sensitive   = true
-  default = {
-    type  = "ssh"
-    agent = true
-  }
-}
-
-variable "ansible_groups" {
-  description = "List of ansible groups to assign to the VM"
-  type        = list(string)
-  default     = ["all"]
 }

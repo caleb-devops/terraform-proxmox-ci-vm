@@ -29,5 +29,8 @@ module "ubuntu_vm" {
   ciuser  = "ubuntu"
   sshkeys = file("~/.ssh/id_ed25519.pub")
 
-  ansible_groups = ["master"]
+  tags = {
+    Environment = "test"
+  }
+  ansible_groups = ["group1"]
 }

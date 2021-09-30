@@ -63,8 +63,3 @@ module "k3s_agent" {
 
   ansible_groups = ["node"]
 }
-
-resource "ansible_group" "k3s_cluster" {
-  inventory_group_name = "k3s_cluster"
-  children             = ["master", "node"]
-}

@@ -3,6 +3,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   pool        = var.pool
 
   name  = var.name
+  desc  = jsonencode(merge(var.tags, { groups = var.ansible_groups }))
   clone = var.clone
 
   sockets = var.sockets
@@ -117,15 +118,5 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       service serial-getty@ttyS0 restart
       EOT
     ]
-  }
-}
-
-resource "ansible_host" "proxmox_vm" {
-  inventory_hostname = proxmox_vm_qemu.proxmox_vm.name
-
-  groups = var.ansible_groups
-  vars = {
-    ansible_host = proxmox_vm_qemu.proxmox_vm.ssh_host
-    ansible_user = var.ciuser
   }
 }
