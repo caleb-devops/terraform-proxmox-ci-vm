@@ -1,7 +1,5 @@
 # Build Proxmox K3S cluster with Terraform and Ansible
 
-<https://github.com/nbering/terraform-inventory/>
-
 <https://github.com/k3s-io/k3s-ansible>
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
